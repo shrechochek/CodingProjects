@@ -158,6 +158,16 @@ Route::prefix('insider')->middleware('auth')->group(function () {
     Route::post('/themes/{id}/edit', 'ThemesController@edit');
     Route::get('/themes/{id}/delete', 'ThemesController@delete');
 
+    // Theme moderation routes
+    Route::middleware('theme_moderator')->group(function () {
+        Route::get('/themes/{id}/moderate', 'ThemesController@moderateView');
+        Route::post('/themes/{id}/approve', 'ThemesController@approve');
+        Route::post('/themes/{id}/ban', 'ThemesController@banTheme');
+        Route::get('/themes/moderation', 'ThemesController@moderationIndex');
+        Route::get('/users/{id}/ban-themes', 'ThemesController@banUser');
+        Route::get('/users/{id}/unban-themes', 'ThemesController@unbanUser');
+    });
+
 
     Route::get('/scales', 'ScalesController@index');
     Route::get('/scales/create', 'ScalesController@createView');

@@ -80,7 +80,12 @@ class ThemesController extends Controller
 
     }
     function create(Request $request)
-    {        
+    {
+        // Check if user is banned from creating themes
+        if (!\Auth::user()->canCreateThemes()) {
+            return redirect('/insider/themes')->with('error', 'Вам запрещено создавать темы');
+        }
+
         $this->validate($request, [
             'name' => 'required|string',
             'description' => 'required|string',
@@ -89,7 +94,11 @@ class ThemesController extends Controller
         ]);
 
         $theme = \App\Theme::make(\Auth::id(), $request->name, $request->description, $request->css, $request->js, $request->price, $request->image);
-        
+
+        // Set moderation status to pending for new themes
+        $theme->moderation_status = 'pending';
+        $theme->save();
+
         // Автоматически добавить тему в купленные
         \App\ThemeBought::create([
             'user_id' => \Auth::id(),
@@ -97,7 +106,7 @@ class ThemesController extends Controller
         ]);
 
         return redirect('/insider/themes/' . $theme->id);
-        
+
     }
     
     function editView($id)
@@ -117,6 +126,12 @@ class ThemesController extends Controller
         if (!($user->role === 'teacher' || $theme->user_id === $user->id)) {
             abort(403, 'Нет доступа к редактированию этой темы');
         }
+
+        // Check if user is banned from creating themes
+        if (!$user->canCreateThemes()) {
+            return redirect('/insider/themes')->with('error', 'Вам запрещено редактировать темы');
+        }
+
         $this->validate($request, [
             'name' => 'required|string',
             'description' => 'required|string',
@@ -124,6 +139,13 @@ class ThemesController extends Controller
 
         ]);
         \App\Theme::modify($id, $request->name, $request->description, $request->image, $request->price, $request->css, $request->js);
+
+        // Set theme back to pending status after modification
+        $theme->moderation_status = 'pending';
+        $theme->moderated_at = null;
+        $theme->moderated_by = null;
+        $theme->save();
+
         return redirect('/insider/themes/' . $id);
     }
 
@@ -136,5 +158,49 @@ class ThemesController extends Controller
         }
         $theme->delete();
         return redirect('/insider/themes');
+    }
+
+    // Theme Moderation Methods
+    function moderationIndex()
+    {
+        $pendingThemes = \App\Theme::where('moderation_status', 'pending')->with('user')->get();
+        $bannedThemes = \App\Theme::where('moderation_status', 'banned')->with('user')->get();
+        $bannedUsers = \App\User::where('theme_banned', true)->get();
+
+        return view('themes.moderation', compact('pendingThemes', 'bannedThemes', 'bannedUsers'));
+    }
+
+    function moderateView($id)
+    {
+        $theme = \App\Theme::with('user')->findOrFail($id);
+        return view('themes.moderate', compact('theme'));
+    }
+
+    function approve(Request $request, $id)
+    {
+        $theme = \App\Theme::findOrFail($id);
+        $theme->approve(\Auth::id());
+        return redirect('/insider/themes/moderation')->with('success', 'Тема одобрена');
+    }
+
+    function banTheme(Request $request, $id)
+    {
+        $theme = \App\Theme::findOrFail($id);
+        $theme->ban(\Auth::id());
+        return redirect('/insider/themes/moderation')->with('success', 'Тема забанена');
+    }
+
+    function banUser($id)
+    {
+        $user = \App\User::findOrFail($id);
+        $user->banFromThemes();
+        return redirect('/insider/themes/moderation')->with('success', 'Пользователь забанен');
+    }
+
+    function unbanUser($id)
+    {
+        $user = \App\User::findOrFail($id);
+        $user->unbanFromThemes();
+        return redirect('/insider/themes/moderation')->with('success', 'Пользователь разбанен');
     }
 }

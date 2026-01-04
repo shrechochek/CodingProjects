@@ -18,22 +18,38 @@
         <li class="nav-item">
             <a class="nav-link active" id="pills-own-tab" data-toggle="pill" href="#pills-own" role="tab">Profile</a>
         </li>
+        @if(\Auth::user()->canCreateThemes())
         <li class="nav-item" style="height: 100%;">
             <a class="btn btn-success nav-link" style="color: white;" href="/insider/themes/create">Создать</a>
         </li>
+        @endif
+        @if(\Auth::user()->isThemeModerator())
+        <li class="nav-item" style="height: 100%;">
+            <a class="btn btn-warning nav-link" style="color: white;" href="/insider/themes/moderation">Модерация</a>
+        </li>
+        @endif
     </ul></div>
     <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade" id="pills-marketplace" role="tabpanel">
             @foreach($themes as $theme)
 
 
-                <div class="card" style="min-width: 40%; border-left: 3px solid #28a745;">
+                <div class="card" style="min-width: 40%; border-left: 3px solid {{ $theme->isPending() ? '#ffc107' : ($theme->isBanned() ? '#dc3545' : '#28a745') }};">
                     <div class="card-body">
                         <div class="media">
                             <div class="media-body row">
                                 <div style=' width:100px; height:100px; background-image:url("{{$theme->image}}"); background-size: cover; float:left;'></div>
                                 <div class="row col" style="margin-left: 0px">
-                                    <h5 class="col com-md-12"><a href="{{url('/insider/themes/'.$theme->id)}}"> {{$theme->name}}</a></h5>
+                                    <h5 class="col com-md-12">
+                                        <a href="{{url('/insider/themes/'.$theme->id)}}"> {{$theme->name}}</a>
+                                        @if($theme->isPending())
+                                            <span class="badge badge-warning">Ожидает проверки</span>
+                                        @elseif($theme->isBanned())
+                                            <span class="badge badge-danger">Забанена</span>
+                                        @else
+                                            <span class="badge badge-success">Одобрена</span>
+                                        @endif
+                                    </h5>
 
                                     <p class="col col-md-12" style="display: flex; justify-content: space-between; align-items: center;">
                                     <small class="disabled">Автор {{$theme->user->name}}</small>
