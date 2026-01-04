@@ -1,6 +1,6 @@
 @extends('layouts.left-menu')
 @section('title')
-    {{$theme->name}}
+    Темы оформления
 @endsection
 @section('head')
     @if ($is_try)
