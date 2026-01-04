@@ -163,6 +163,7 @@ Route::prefix('insider')->middleware('auth')->group(function () {
         Route::get('/themes/{id}/moderate', 'ThemesController@moderateView');
         Route::post('/themes/{id}/approve', 'ThemesController@approve');
         Route::post('/themes/{id}/ban', 'ThemesController@banTheme');
+        Route::get('/themes/{id}/unban', 'ThemesController@unbanTheme');
         Route::get('/themes/moderation', 'ThemesController@moderationIndex');
         Route::get('/users/{id}/ban-themes', 'ThemesController@banUser');
         Route::get('/users/{id}/unban-themes', 'ThemesController@unbanUser');

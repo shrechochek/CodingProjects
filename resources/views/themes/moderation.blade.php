@@ -16,6 +16,9 @@
                             <p class="card-text">Автор: {{ $theme->user->name }}</p>
                             <p class="card-text">Создана: {{ $theme->created_at ? $theme->created_at->format('d.m.Y H:i') : 'Неизвестно' }}</p>
                             <a href="/insider/themes/{{ $theme->id }}/moderate" class="btn btn-primary">Проверить</a>
+                            <a href="/insider/themes/{{ $theme->id }}/edit" class="btn btn-warning btn-sm ml-2">Редактировать</a>
+                            <a href="/insider/themes/{{ $theme->id }}/delete" class="btn btn-danger btn-sm ml-2"
+                               onclick="return confirm('Удалить тему «{{ $theme->name }}» навсегда?')">Удалить</a>
                         </div>
                     </div>
                 @endforeach
@@ -30,6 +33,9 @@
                             <p class="card-text">Автор: {{ $theme->user->name }}</p>
                             <p class="card-text">Одобрена: {{ $theme->moderated_at ? $theme->moderated_at->format('d.m.Y H:i') : 'Неизвестно' }}</p>
                             <p class="card-text">Модератор: {{ $theme->moderator ? $theme->moderator->name : 'Неизвестен' }}</p>
+                            <a href="/insider/themes/{{ $theme->id }}/edit" class="btn btn-warning btn-sm">Редактировать</a>
+                            <a href="/insider/themes/{{ $theme->id }}/delete" class="btn btn-danger btn-sm ml-2"
+                               onclick="return confirm('Удалить тему «{{ $theme->name }}» навсегда?')">Удалить</a>
                         </div>
                     </div>
                 @endforeach
@@ -44,6 +50,11 @@
                             <p class="card-text">Автор: {{ $theme->user->name }}</p>
                             <p class="card-text">Забанена: {{ $theme->moderated_at ? $theme->moderated_at->format('d.m.Y H:i') : 'Неизвестно' }}</p>
                             <p class="card-text">Модератор: {{ $theme->moderator ? $theme->moderator->name : 'Неизвестен' }}</p>
+                            <a href="/insider/themes/{{ $theme->id }}/unban" class="btn btn-success btn-sm"
+                               onclick="return confirm('Разбанить тему «{{ $theme->name }}»?')">Разбанить</a>
+                            <a href="/insider/themes/{{ $theme->id }}/edit" class="btn btn-warning btn-sm ml-2">Редактировать</a>
+                            <a href="/insider/themes/{{ $theme->id }}/delete" class="btn btn-danger btn-sm ml-2"
+                               onclick="return confirm('Удалить тему «{{ $theme->name }}» навсегда?')">Удалить</a>
                         </div>
                     </div>
                 @endforeach

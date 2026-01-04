@@ -113,7 +113,7 @@ class ThemesController extends Controller
     {
         $theme = \App\Theme::find($id);
         $user = \Auth::user();
-        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || $theme->user_id === $user->id)) {
+        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || (int)$theme->user_id === (int)$user->id)) {
             abort(403, 'Нет доступа к редактированию этой темы');
         }
         return view('themes.edit', compact('theme'));
@@ -123,7 +123,7 @@ class ThemesController extends Controller
     {
         $theme = \App\Theme::find($id);
         $user = \Auth::user();
-        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || $theme->user_id === $user->id)) {
+        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || (int)$theme->user_id === (int)$user->id)) {
             abort(403, 'Нет доступа к редактированию этой темы');
         }
 
@@ -153,7 +153,7 @@ class ThemesController extends Controller
     {
         $theme = \App\Theme::find($id);
         $user = \Auth::user();
-        if (!($user->role === 'teacher' || $user->role === 'admin' || $theme->user_id === $user->id)) {
+        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || (int)$theme->user_id === (int)$user->id)) {
             abort(403, 'Нет доступа к удалению этой темы');
         }
         $theme->delete();
@@ -189,6 +189,16 @@ class ThemesController extends Controller
         $theme = \App\Theme::findOrFail($id);
         $theme->ban(\Auth::id());
         return redirect('/insider/themes/moderation')->with('success', 'Тема забанена');
+    }
+
+    function unbanTheme($id)
+    {
+        $theme = \App\Theme::findOrFail($id);
+        $theme->moderation_status = 'approved';
+        $theme->moderated_at = now();
+        $theme->moderated_by = \Auth::id();
+        $theme->save();
+        return redirect('/insider/themes/moderation')->with('success', 'Тема разбанена');
     }
 
     function banUser($id)
