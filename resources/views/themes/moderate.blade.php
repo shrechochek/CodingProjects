@@ -24,6 +24,10 @@
                                 <span class="badge badge-danger">Забанена</span>
                             @endif
                         </p>
+                        @if($theme->moderator)
+                            <p class="card-text"><strong>Модератор:</strong> {{ $theme->moderator->name }}</p>
+                            <p class="card-text"><strong>Дата модерации:</strong> {{ $theme->moderated_at ? $theme->moderated_at->format('d.m.Y H:i') : 'Неизвестно' }}</p>
+                        @endif
                     </div>
                 </div>
 

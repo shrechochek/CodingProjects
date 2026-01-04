@@ -113,7 +113,7 @@ class ThemesController extends Controller
     {
         $theme = \App\Theme::find($id);
         $user = \Auth::user();
-        if (!($user->role === 'teacher' || $theme->user_id === $user->id)) {
+        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || $theme->user_id === $user->id)) {
             abort(403, 'Нет доступа к редактированию этой темы');
         }
         return view('themes.edit', compact('theme'));
@@ -123,7 +123,7 @@ class ThemesController extends Controller
     {
         $theme = \App\Theme::find($id);
         $user = \Auth::user();
-        if (!($user->role === 'teacher' || $theme->user_id === $user->id)) {
+        if (!($user->role === 'admin' || $user->isThemeModerator() || $user->role === 'teacher' || $theme->user_id === $user->id)) {
             abort(403, 'Нет доступа к редактированию этой темы');
         }
 
@@ -164,15 +164,16 @@ class ThemesController extends Controller
     function moderationIndex()
     {
         $pendingThemes = \App\Theme::where('moderation_status', 'pending')->with('user')->get();
-        $bannedThemes = \App\Theme::where('moderation_status', 'banned')->with('user')->get();
+        $approvedThemes = \App\Theme::where('moderation_status', 'approved')->with('user', 'moderator')->get();
+        $bannedThemes = \App\Theme::where('moderation_status', 'banned')->with('user', 'moderator')->get();
         $bannedUsers = \App\User::where('theme_banned', true)->get();
 
-        return view('themes.moderation', compact('pendingThemes', 'bannedThemes', 'bannedUsers'));
+        return view('themes.moderation', compact('pendingThemes', 'approvedThemes', 'bannedThemes', 'bannedUsers'));
     }
 
     function moderateView($id)
     {
-        $theme = \App\Theme::with('user')->findOrFail($id);
+        $theme = \App\Theme::with('user', 'moderator')->findOrFail($id);
         return view('themes.moderate', compact('theme'));
     }
 

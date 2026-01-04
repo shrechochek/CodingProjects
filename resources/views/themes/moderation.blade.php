@@ -7,7 +7,7 @@
         <h2>Модерация тем</h2>
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <h3>Ожидают проверки</h3>
                 @foreach($pendingThemes as $theme)
                     <div class="card mb-3">
@@ -21,7 +21,21 @@
                 @endforeach
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <h3>Одобренные темы</h3>
+                @foreach($approvedThemes ?? [] as $theme)
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $theme->name }}</h5>
+                            <p class="card-text">Автор: {{ $theme->user->name }}</p>
+                            <p class="card-text">Одобрена: {{ $theme->moderated_at ? $theme->moderated_at->format('d.m.Y H:i') : 'Неизвестно' }}</p>
+                            <p class="card-text">Модератор: {{ $theme->moderator ? $theme->moderator->name : 'Неизвестен' }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="col-md-4">
                 <h3>Забаненные темы</h3>
                 @foreach($bannedThemes as $theme)
                     <div class="card mb-3">
@@ -29,6 +43,7 @@
                             <h5 class="card-title">{{ $theme->name }}</h5>
                             <p class="card-text">Автор: {{ $theme->user->name }}</p>
                             <p class="card-text">Забанена: {{ $theme->moderated_at ? $theme->moderated_at->format('d.m.Y H:i') : 'Неизвестно' }}</p>
+                            <p class="card-text">Модератор: {{ $theme->moderator ? $theme->moderator->name : 'Неизвестен' }}</p>
                         </div>
                     </div>
                 @endforeach
