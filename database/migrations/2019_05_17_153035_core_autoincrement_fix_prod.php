@@ -13,10 +13,8 @@ class CoreAutoincrementFixProd extends Migration
      */
     public function up()
     {
-        //
-
-        DB::statement('ALTER SEQUENCE public.core_edges_id_seq RESTART WITH 1337');
-        DB::statement('ALTER SEQUENCE public.core_nodes_id_seq RESTART WITH 1337');
+        // This migration is PostgreSQL-specific and not needed for SQLite
+        // ALTER SEQUENCE commands are not supported in SQLite
     }
 
     /**

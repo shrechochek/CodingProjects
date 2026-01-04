@@ -82,7 +82,7 @@ Route::get('/activate', 'BotController@activateView');
 Route::get('/activate/success', 'BotController@successView');
 Route::post('/activate', 'BotController@activate');
 
-Route::prefix('insider')->middleware('verified')->group(function () {
+Route::prefix('insider')->middleware('auth')->group(function () {
 
     #TODO Check
     Route::get('/', function () {
