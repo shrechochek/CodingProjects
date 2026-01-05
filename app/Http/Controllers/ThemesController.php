@@ -93,11 +93,18 @@ class ThemesController extends Controller
 
         ]);
 
-        $theme = \App\Theme::make(\Auth::id(), $request->name, $request->description, $request->css, $request->js, $request->price, $request->image);
-
-        // Set moderation status to pending for new themes
+        $theme = new \App\Theme();
+        $theme->user_id = \Auth::id();
+        $theme->name = $request->name;
+        $theme->description = $request->description;
+        $theme->price = $request->price;
+        $theme->image = $request->image;
         $theme->moderation_status = 'pending';
         $theme->save();
+
+        // Create the theme files in storage
+        \Storage::disk('local')->put('themes/'.$theme->id.'/script.js', $request->js);
+        \Storage::disk('local')->put('themes/'.$theme->id.'/style.css', $request->css);
 
         // Автоматически добавить тему в купленные
         \App\ThemeBought::create([
