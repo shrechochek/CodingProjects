@@ -110,9 +110,17 @@ class LessonsController extends Controller
                 $lesson->prerequisites()->attach($prerequisite_id);
             }
         $lesson->name = $request->name;
+        $oldStartDate = $lesson->getStartDate($course);
         $lesson->setStartDate($course, $request->start_date);
         $lesson->description = clean($request->description);
         $lesson->chapter_id = $request->chapter;
+
+        // Recalculate points if start date changed (lesson became started or stopped)
+        if ($oldStartDate != $request->start_date) {
+            foreach ($course->students as $student) {
+                \App\Jobs\RecalculateCourseStudentPoints::dispatch($course->id, $student->id);
+            }
+        }
         if ($request->open == "yes")
             $lesson->is_open = true;
         else
